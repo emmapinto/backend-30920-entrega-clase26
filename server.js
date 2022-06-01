@@ -4,7 +4,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import handlebars from "express-handlebars";
 import mongoose from "mongoose";
-
+import faker from "faker";
 import passport from "passport";
 import bCrypt from "bcrypt";
 import { Strategy as LocalStrategy } from "passport-local";
@@ -15,6 +15,9 @@ const MONGO_DB_URI =
 	"mongodb+srv://moncholoco:moncholoco@cluster0.jj0on.mongodb.net/passport?retryWrites=true&w=majority";
 
 const app = express();
+
+let productos = [ ];
+let id=1
 
 app.use(cookieParser());
 app.use(
@@ -180,7 +183,18 @@ app.get("/login", (req, res) => {
 // El req.user.username no solo devuelve la ID, sino todo el usuario
 app.get("/", (req, res) => {
 	if (req.isAuthenticated()) {
-		res.render("home", { username: req.user.username });
+		for (let i = 0; i < 10; i++){
+            const producto = {
+                nombre: faker.commerce.productName(),
+                precio: faker.commerce.price(),
+                foto: faker.image.imageUrl(),
+                id: id++
+            }
+            productos.push(producto);
+        }
+		res.render("home", { username: req.user.username, item: productos });
+        productos=[]
+        id=1
 	} else {
 		res.redirect("login");
 	}
